@@ -1,5 +1,6 @@
 package com.example.creditapp.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,6 +9,7 @@ import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class LoanApplicationRequestDTO {
    private BigDecimal amount;
    private Integer term;

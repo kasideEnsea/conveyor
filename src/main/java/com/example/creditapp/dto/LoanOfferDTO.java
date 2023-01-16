@@ -18,6 +18,14 @@ public class LoanOfferDTO {
     private Boolean isInsuranceEnabled;
     private Boolean isSalaryClient;
 
-    public LoanOfferDTO(BigDecimal requestedAmount, BigDecimal totalAmount, Integer term, BigDecimal monthlyPayment, BigDecimal rate, boolean isInsuranceEnabled, boolean isSalaryClient) {
+    public LoanOfferDTO(BigDecimal requestedAmount, BigDecimal totalAmount, Integer term, BigDecimal monthlyPayment, BigDecimal rate, Boolean isInsuranceEnabled, Boolean isSalaryClient) {
+        applicationId = null;
+        this.requestedAmount = requestedAmount;
+        this.totalAmount = totalAmount;
+        this.term = term;
+        this.monthlyPayment = monthlyPayment;
+        this.rate = rate;
+        this.isInsuranceEnabled = isInsuranceEnabled;
+        this.isSalaryClient = isSalaryClient;
     }
 }
