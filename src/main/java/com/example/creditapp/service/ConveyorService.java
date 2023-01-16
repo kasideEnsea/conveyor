@@ -37,8 +37,8 @@ public class ConveyorService {
 
 
     public boolean prescoring(LoanApplicationRequestDTO dto) {
-        log.info(dto.toString());
-        return (DataUtils.checkLengthBetween(dto.getFirstName(), 2, 30) &&
+        log.info("Prescoring " + dto.toString());
+        boolean result =  (DataUtils.checkLengthBetween(dto.getFirstName(), 2, 30) &&
                 DataUtils.checkLengthBetween(dto.getLastName(), 2, 30) &&
                 (DataUtils.isEmptyOrNull(dto.getMiddleName()) ||
                         DataUtils.checkLengthBetween(dto.getMiddleName(), 2, 30)) &&
@@ -49,37 +49,39 @@ public class ConveyorService {
                 DataUtils.checkLengthEquals(dto.getPassportNumber(), 6) &&
                 DataUtils.checkLengthEquals(dto.getPassportSeries(), 4)
         );
+        log.info("Prescoring result " + (result ? "accepted" : "refused"));
+        return result;
     }
 
 
     public List<LoanOfferDTO> getOffers(LoanApplicationRequestDTO loanApplicationRequestDTO) {
-        log.info(loanApplicationRequestDTO.toString());
+        log.info("Get offers for loan application dto " + loanApplicationRequestDTO.toString());
         List<LoanOfferDTO> offers = new ArrayList<>();
         offers.add(createOffer(loanApplicationRequestDTO, true, true));
         offers.add(createOffer(loanApplicationRequestDTO, true, false));
         offers.add(createOffer(loanApplicationRequestDTO, false, true));
         offers.add(createOffer(loanApplicationRequestDTO, false, false));
         offers.sort((o1, o2) -> o1.getRate().subtract(o2.getRate()).signum());
+        log.info("Recieved offers: ");
         offers.forEach(loanOfferDTO -> log.info(loanOfferDTO.toString()));
         return offers;
     }
 
     private LoanOfferDTO createOffer(LoanApplicationRequestDTO requestDTO, boolean isInsuranceEnabled,
                                      boolean isSalaryClient) {
-        log.info(requestDTO.toString() + ", is insurance enable: " + isInsuranceEnabled + ", is salary client: " + isSalaryClient);
+        log.info("Create offer for request " + requestDTO.toString() + ", is insurance enable: " + isInsuranceEnabled + ", is salary client: " + isSalaryClient);
         BigDecimal requestedAmount = requestDTO.getAmount();
         BigDecimal totalAmount = isInsuranceEnabled ? requestedAmount.add(INSURANCE_COST) : requestedAmount;
         log.info("Total amount: " + totalAmount);
         Integer term = requestDTO.getTerm();
         BigDecimal rate = generateRate(isInsuranceEnabled, isSalaryClient);
         log.info("Rate: " + rate);
-        //Нормальные id предложений будут формироваться при добавлении в БД как primary key, пока что хардкод
-        return new LoanOfferDTO(1L, requestedAmount, totalAmount, term, monthlyPayment(totalAmount, rate, term),
+        return new LoanOfferDTO(requestedAmount, totalAmount, term, monthlyPayment(totalAmount, rate, term),
                 rate, isInsuranceEnabled, isSalaryClient);
     }
 
     private BigDecimal generateRate(boolean isInsuranceEnabled, boolean isSalaryClient) {
-        log.info("is insurance enable: " + isInsuranceEnabled + ", is salary client: " + isSalaryClient);
+        log.info("Generate rate: is insurance enable: " + isInsuranceEnabled + ", is salary client: " + isSalaryClient);
         BigDecimal insuranceDecline = isInsuranceEnabled ? INSURANCE_RATE_DECLINE : BigDecimal.valueOf(0);
         BigDecimal scDecline = isSalaryClient ? SALARY_CLIENT_RATE_DECLINE : BigDecimal.valueOf(0);
         log.info(insuranceDecline.toString() + ", " + scDecline.toString());
@@ -94,7 +96,7 @@ public class ConveyorService {
     }
 
     public RateOrDeny score(ScoringDataDTO dto) {
-        log.info(dto.toString());
+        log.info("Get rate or deny for " + dto.toString());
         BigDecimal rate = generateRate(dto.getIsInsuranceEnabled(), dto.getIsSalaryClient());
         RateOrDeny rateOrDeny = new RateOrDeny();
         switch (dto.getEmployment().getEmploymentStatus()) {
@@ -117,19 +119,20 @@ public class ConveyorService {
                 break;
         }
         rateOrDeny.setRate(rate);
-        log.info(rateOrDeny.toString());
+        log.info("Result: " + (rateOrDeny.isDenied() ? "denied" : ("rate is " + rateOrDeny.getRate())));
         return rateOrDeny;
     }
 
     public List<PaymentScheduleElement> createPaymentSchedule(BigDecimal amount, BigDecimal rate, Integer term) {
+        log.info("Create payment schedule for {}, {}, {}", amount, rate, term );
         List<PaymentScheduleElement> paymentSchedule = new ArrayList<>();
         int i = 1;
         LocalDate date = LocalDate.now();
-        log.info(date.toString());
+        log.info("Date: " + date.toString());
         BigDecimal totalPayment = monthlyPayment(amount, rate, term);
-        log.info(totalPayment.toString());
+        log.info("Total payment: " + totalPayment.toString());
         BigDecimal debtPayment = amount.divide(rate, 0);
-        log.info(debtPayment.toString());
+        log.info("Debt payment: " + debtPayment.toString());
         while (i <= term) {
             PaymentScheduleElement element = new PaymentScheduleElement();
             element.setNumber(i++);

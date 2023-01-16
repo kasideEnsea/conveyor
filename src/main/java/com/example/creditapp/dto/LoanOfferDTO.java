@@ -2,6 +2,7 @@ package com.example.creditapp.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 
@@ -16,4 +17,7 @@ public class LoanOfferDTO {
     private BigDecimal rate;
     private Boolean isInsuranceEnabled;
     private Boolean isSalaryClient;
+
+    public LoanOfferDTO(BigDecimal requestedAmount, BigDecimal totalAmount, Integer term, BigDecimal monthlyPayment, BigDecimal rate, boolean isInsuranceEnabled, boolean isSalaryClient) {
+    }
 }
