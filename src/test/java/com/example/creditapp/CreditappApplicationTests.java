@@ -3,12 +3,10 @@ package com.example.creditapp;
 import com.example.creditapp.dto.LoanApplicationRequestDTO;
 import com.example.creditapp.dto.LoanOfferDTO;
 import com.example.creditapp.service.ConveyorService;
-import kafka.controller.LeaderIsrAndControllerEpoch;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
